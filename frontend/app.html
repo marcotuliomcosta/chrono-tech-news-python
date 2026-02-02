@@ -512,7 +512,7 @@
                 <p class="subtitle">Notícias de tecnologia em tempo real - Python/FastAPI Edition</p>
             </div>
             <div class="header-actions">
-                <button class="btn" id="refreshBtn" onclick="fetchArticles()">
+                <button class="btn" id="refreshBtn" onclick="refreshNews()">
                     <span>🔄</span>
                     <span>Atualizar</span>
                 </button>
@@ -637,10 +637,41 @@
             return date.toLocaleDateString('pt-BR');
         }
 
-        async function fetchArticles(page = 1) {
+        async function refreshNews() {
             const btn = document.getElementById('refreshBtn');
             const content = document.getElementById('content');
             btn.disabled = true;
+
+            try {
+                content.innerHTML = '<div class="loading"><div class="spinner"></div><p>Buscando notícias novas...</p></div>';
+
+                // Dispara o scraping de notícias
+                await fetch(`${API_URL}/scraper/fetch`, { method: 'POST' });
+
+                // Aguarda 3 segundos para o scraping começar a salvar
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Busca os artigos atualizados
+                await fetchArticles(1);
+
+                showToast('Notícias atualizadas!', 'success');
+            } catch (e) {
+                content.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Erro</h3><p>${e.message}</p></div>`;
+                showToast('Erro ao atualizar notícias', 'error');
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function fetchArticles(page = 1) {
+            const btn = document.getElementById('refreshBtn');
+            const content = document.getElementById('content');
+
+            // Só desabilita o botão se não estiver chamando via refreshNews
+            const wasDisabled = btn.disabled;
+            if (!wasDisabled) {
+                btn.disabled = true;
+            }
 
             if (page === 1) {
                 content.innerHTML = '<div class="loading"><div class="spinner"></div><p>Carregando...</p></div>';
@@ -684,7 +715,10 @@
             } catch (e) {
                 content.innerHTML = `<div class="empty-state"><div class="empty-icon">⚠️</div><h3>Erro</h3><p>${e.message}</p></div>`;
             } finally {
-                btn.disabled = false;
+                // Só habilita se foi desabilitado por esta função
+                if (!wasDisabled) {
+                    btn.disabled = false;
+                }
             }
         }
 
