@@ -18,21 +18,21 @@ async def lifespan(app: FastAPI):
     Gerencia o ciclo de vida da aplicação
     """
     # Startup
-    print("🚀 Iniciando Chrono Tech News...")
+    print("[*] Iniciando Chrono Tech News...")
 
     # Criar tabelas
     Base.metadata.create_all(bind=engine)
-    print("✅ Tabelas criadas/verificadas")
+    print("[OK] Tabelas criadas/verificadas")
 
     # Iniciar scheduler (cron jobs)
     if settings.CRON_ENABLED:
         start_scheduler()
-        print(f"⏰ Scheduler iniciado (intervalo: {settings.FETCH_NEWS_INTERVAL_MINUTES} min)")
+        print(f"[*] Scheduler iniciado (intervalo: {settings.FETCH_NEWS_INTERVAL_MINUTES} min)")
 
     yield
 
     # Shutdown
-    print("👋 Encerrando aplicação...")
+    print("[*] Encerrando aplicação...")
     if settings.CRON_ENABLED:
         shutdown_scheduler()
 

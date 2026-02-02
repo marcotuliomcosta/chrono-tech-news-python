@@ -13,13 +13,13 @@ def fetch_news_job():
     """
     Job que busca notícias periodicamente
     """
-    print("⏰ Executando job de busca de notícias...")
+    print("[*] Executando job de busca de noticias...")
     db = SessionLocal()
     try:
         scrape_and_save_news(db)
-        print("✅ Job concluído com sucesso")
+        print("[OK] Job concluido com sucesso")
     except Exception as e:
-        print(f"❌ Erro no job: {e}")
+        print(f"[ERROR] Erro no job: {e}")
     finally:
         db.close()
 
@@ -38,7 +38,7 @@ def start_scheduler():
     )
 
     scheduler.start()
-    print(f"✅ Scheduler iniciado - Job rodará a cada {settings.FETCH_NEWS_INTERVAL_MINUTES} min")
+    print(f"[OK] Scheduler iniciado - Job rodara a cada {settings.FETCH_NEWS_INTERVAL_MINUTES} min")
 
 
 def shutdown_scheduler():
@@ -47,4 +47,4 @@ def shutdown_scheduler():
     """
     if scheduler.running:
         scheduler.shutdown()
-        print("❌ Scheduler parado")
+        print("[*] Scheduler parado")
